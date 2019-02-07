@@ -1,0 +1,53 @@
+The docker image can be found at:
+https://hub.docker.com/r/woodswift/dgaclf
+
+The docker pull command is:
+docker pull woodswift/dgaclf:v0.0.1
+
+After the pull operation is completed, run "docker image ls" to check whether
+the pull operation is successful.
+
+To start the micro-service, you can run:
+
+docker run -p 4000:4000 woodswift/dgaclf:v0.0.1
+
+To check how the micro-service, open a web browser or Postman first.
+
+(1) Example 1: www1.undefinedratiotanks.nrw
+Enter "http://localhost:4000/predict?domain=www1.undefinedratiotanks.nrw", and
+then the following result is shown:
+
+{
+    "domain": "www1.undefinedratiotanks.nrw",
+    "label": "dga",
+    "probability_to_be_dga": "0.99978226",
+    "success": true
+}
+
+"domain" stores the input domain name;
+"label" stores the predicted class (dga or legit);
+"probability_to_be_dga" stores the probability that the input domain name is a
+dga from the model;
+"success" stores whether the model makes prediction for the input domain name
+sccuessfully (true or false);
+
+(2) Example 2: iraq-live.com
+Enter "http://localhost:4000/predict?domain=iraq-live.com", and
+then the following result is shown:
+
+{
+    "domain": "iraq-live.com",
+    "label": "legit",
+    "probability_to_be_dga": "5.228832e-07",
+    "success": true
+}
+
+Hit CTRL+C in the terminal to quit.
+
+When a collection of domain names need to be predicted by the micro-service,
+please refer to the script test_api.py and the example inside.
+
+If tensorflow, keras, numpy and flask have been installed already, the micro-
+service can be also started by running:
+
+python app.py

@@ -1,0 +1,97 @@
+The goal is to train the model predicting whether the domain name is a DGA from
+malware:
+"legit": represented by 0
+"dga": represented by 1
+
+The script rnn_clf.py includes three steps in total:
+1. read and pre-process the raw data
+2. train the model
+3. evaluate the performance
+
+Pre-process step completes three tasks:
+(1) trim the useless whitespaces of each record at the front and end
+(2) split each record by comma
+(3) lowercase the label of each record
+
+As a result, the raw data contains 157,927 rows in total:
+(1) 157,926 of them are labeled
+(2) 157,913 of them are labeled with "legit" or "dga"
+
+The distribution of two classes is 51.13% ("legit") to 48.87% ("dga"), which is
+nearly balanced. Hence, accuracy will be a reasonable metric to evaluate the
+performance of the model.
+
+I plan to apply RNN algorithm to learn the pattern of character dependency
+inside the domain names. Hence, I explore the statistics of the vocabulary of
+characters and the length of domain name.
+
+There are 38 different characters found in total. They are 26 letters from a to
+z, 10 digits from 0 to 9, and 2 signs including '.' and '-'.
+
+The maximum length of domain name found is 60 characters, and 99% of domain
+names' length is no greater than 41.
+
+Therefore, the 157,913 rows labeled with "legit" or "dga" are randomly split to
+form train, dev and test datasets:
+(1) Train dataset: used to train the model
+(2) Dev dataset: used to tune the parameters of the model
+(3) Test dataset: used to evaluate the performance
+
+The distribution of dataset size is 80% (train) vs. 10% (dev) vs. 10% (test)
+The distribution of two classes in each dataset is kept almost the same as
+51.13% ("legit") to 48.87% ("dga") in each dataset.
+
+When defining the tokenizer function, I set MAX_NB_CHARS to be 54 and
+MAX_LENGTH to be 40. The tokenizer function treats character as token. For the
+domain names whose length is less than 40, I apply pre-padding to keep the
+sequence in the same shape.
+
+The RNN model includes 4 layers in total:
+(1) Input layer
+(2) Embedding layer with EMBEDDING_DIM to be 100
+(3) GRU layer with UNIT to be 128
+(4) Dense layer
+
+The model is trained offline. The tokenizer function and the model are
+serialized for API usage.
+
+The performance of the model is shown below.
+
+Performance of train dataset:
+
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00     64464
+           1       1.00      1.00      1.00     61865
+
+   micro avg       1.00      1.00      1.00    126329
+   macro avg       1.00      1.00      1.00    126329
+weighted avg       1.00      1.00      1.00    126329
+
+AUC: 0.9999694305411284
+
+Performance of dev dataset:
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.99      1.00      8167
+           1       0.99      1.00      1.00      7625
+
+   micro avg       1.00      1.00      1.00     15792
+   macro avg       1.00      1.00      1.00     15792
+weighted avg       1.00      1.00      1.00     15792
+
+AUC: 0.9999155979581964
+
+Performance of test dataset:
+
+              precision    recall  f1-score   support
+
+           0       1.00      0.99      1.00      8104
+           1       0.99      1.00      1.00      7688
+
+   micro avg       1.00      1.00      1.00     15792
+   macro avg       1.00      1.00      1.00     15792
+weighted avg       1.00      1.00      1.00     15792
+
+AUC: 0.9999057357115049
